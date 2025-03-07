@@ -1,5 +1,5 @@
 import random
-from player import player
+import player
 
 # 定義顏色遺傳規則
 COLOR_MIX_RULES = {
