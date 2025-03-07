@@ -13,8 +13,35 @@ class Player:
         self.rainbow_energy = 0 
 
     def add_creature(self, creature):
-        """新增魔法生物到持有列表"""
+        """新增魔法生物到持有列表（受限於可容納數量）"""
+        if len(self.inventory) >= self.max_creatures:
+            print("❌ 培育室已滿，無法新增生物！請先釋放或合併現有生物。")
+            return
+        
         self.inventory.append(creature)
+        print(f"✅ {creature.name}（{creature.color}） 加入培育室！目前數量：{len(self.inventory)}/{self.max_creatures}")
+
+    def unlock_land(self):
+        """使用七彩能量解鎖新的土地，擴建培育室，並在首次解鎖時獲得夢魘貓（黃）"""
+        if self.rainbow_energy < 1:
+            print("❌ 七彩能量不足！需要 1 顆七彩能量來解鎖新土地。")
+            return
+
+        self.rainbow_energy -= 1
+        self.unlocked_lands += 1
+        self.max_creatures += 5  # 每次解鎖增加 5 個可容納生物數量
+        print(f"🌿 你使用 1 顆七彩能量，成功淨化了一塊被污染的土地！")
+        print(f"🏡 你的培育室擴建完成，可容納生物數量增加至 {self.max_creatures}！")
+
+        # 第一次解鎖土地時，獲得夢魘貓（黃）並解鎖新地圖
+        if self.unlocked_lands == 1:
+            new_creature = MagicCreature("夢魘貓", "黃", 50, 10)
+            self.add_creature(new_creature)
+            print("✨ 你發現了一隻 **夢魘貓（黃）**，並成功將牠帶回培育室！")
+            print("🌙 你解鎖了一個新的探索地點：**夢魘灣**！")
+
+        else:
+            print(f"🌍 你已成功淨化 {self.unlocked_lands} 塊土地！繼續探索吧！")
 
     def list_creatures(self):
         """顯示玩家持有的所有魔法生物"""
@@ -37,15 +64,7 @@ class Player:
             print(f"   {resource}：{count}")
 
     def breed_creatures(self, index1, index2):
-        """讓兩隻魔法生物繁殖，但需要「螢露蜜」「螢露土」「螢露水」各 1 個"""
-        
-        # 檢查是否擁有足夠的繁殖資源
-        required_resources = ["螢露蜜", "螢露土", "螢露水"]
-        missing_resources = [res for res in required_resources if self.resources.get(res, 0) < 1]
-        
-        if missing_resources:
-            print(f"❌ 無法繁殖！缺少以下資源：{', '.join(missing_resources)}")
-            return
+        """讓兩隻魔法生物繁殖，依照品種需求不同資源"""
 
         # 確保輸入的索引是有效的
         if index1 < 1 or index2 < 1 or index1 > len(self.inventory) or index2 > len(self.inventory):
@@ -55,6 +74,27 @@ class Player:
         parent1 = self.inventory[index1 - 1]
         parent2 = self.inventory[index2 - 1]
 
+        if parent1.name != parent2.name:
+            print(f"❌ {parent1.name} 和 {parent2.name} 不是同品種，無法繁殖！")
+            return
+
+        # 根據品種決定繁殖所需資源
+        if parent1.name == "星光螢火蟲":
+            required_resources = ["螢露蜜", "螢露土", "螢露水"]
+        elif parent1.name == "夢魘貓":
+            required_resources = ["夢魘之塵", "夢魘精華", "暗影結晶"]
+        else:
+            print(f"❌ {parent1.name} 目前無法繁殖！")
+            return
+
+        # 檢查是否擁有足夠的繁殖資源
+        missing_resources = [res for res in required_resources if self.resources.get(res, 0) < 1]
+        
+        if missing_resources:
+            print(f"❌ 無法繁殖！缺少以下資源：{', '.join(missing_resources)}")
+            return
+
+        # 執行繁殖
         child = parent1.breed(parent2)
         
         if child:
@@ -63,10 +103,9 @@ class Player:
                 self.resources[res] -= 1
             
             self.inventory.append(child)
-            print(f"🍼 {child.name}（{child.color}） 誕生了！你已消耗 1 份「螢露蜜」「螢露土」「螢露水」。")
+            print(f"🍼 {child.name}（{child.color}） 誕生了！你已消耗 1 份「{'、'.join(required_resources)}」。")
 
-            
-    def merge_creatures(self, index1, index2):
+    def merge_creatures(self, index1, index2): 
         """讓兩隻魔法生物合體，提升主體能量，但不直接進化"""
         
         # 確保輸入的索引是有效的
@@ -103,42 +142,59 @@ class Player:
         self.inventory.remove(creature2)  
 
         print(f"✅ {creature1.name}（{creature1.color}） 吞噬後獲得力量，能量提升至 {creature1.energy}，產能提升至 {creature1.energy_rate:.1f}！")
-    def explore(self):
-        """探索螢露谷，隨機獲得資源，有極低機率獲得星光螢火蟲"""
-        print("🛤️ 你開始探索螢露谷... ⏳（需時 1:00）")
+        
+    def explore(self, location="螢露谷"):
+        """探索螢露谷或夢魘灣，獲得不同的資源或魔法生物"""
+        
+        if location not in ["螢露谷", "夢魘灣"]:
+            print("❌ 無效的探索地點！請選擇 `螢露谷` 或 `夢魘灣`")
+            return
+
+        # 夢魘灣只有當玩家解鎖第一塊土地後才可探索
+        if location == "夢魘灣" and self.unlocked_lands < 1:
+            print("❌ 你尚未解鎖「夢魘灣」！請先使用七彩能量解鎖土地。")
+            return
+
+        print(f"🛤️ 你開始探索 {location}... ⏳（需時 1:00）")
         time.sleep(3)  # 模擬探索時間（縮短為 3 秒）
-        
-        # 主要資源獎勵
-        rewards = ["螢露蜜", "螢露土", "螢露水"]
+
+        # 探索獎勵
+        if location == "螢露谷":
+            rewards = ["螢露蜜", "螢露土", "螢露水"]
+            special_creature = ("星光螢火蟲", ["綠", "藍", "紫"], 0.1)  # 10% 機率獲得
+        elif location == "夢魘灣":
+            rewards = ["夢魘之塵", "夢魘精華", "暗影結晶"]
+            special_creature = ("夢魘貓", ["綠", "藍", "紫"], 0.1)  # 10% 機率獲得
+
         reward = random.choice(rewards)
-        
+
         # 確保 `self.resources` 內有這個資源
         if reward in self.resources:
             self.resources[reward] += 1
         else:
             self.resources[reward] = 1  # 若沒有該資源則初始化
 
-        print(f"🎉 你成功探索螢露谷，獲得了 **{reward}**！")
+        print(f"🎉 你成功探索 {location}，獲得了 **{reward}**！")
 
-        # 極低機率（10%）獲得"綠", "藍", "紫"星光螢火蟲
-        if random.random() < 0.1:
-            rare_colors = ["綠", "藍", "紫"]
-            new_color = random.choice(rare_colors)
-            new_creature = MagicCreature("星光螢火蟲", new_color, 50, 10)
+        # 可能遇到特殊生物
+        if random.random() < special_creature[2]:
+            new_color = random.choice(special_creature[1])
+            new_creature = MagicCreature(special_creature[0], new_color, 50, 10)
             self.add_creature(new_creature)
-            print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的星光螢火蟲**，並成功帶回培育室！✨")
+            print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {special_creature[0]}**，並成功帶回培育室！✨")
 
         # 離開期間生物會產生能量
         for creature in self.inventory:
             creature.energy += creature.energy_rate
             print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
-            
-    def help(self):
+
+ 
         """顯示幫助信息"""
-        print("\n📚 **幻彩育境** 指令列表：")
+        print("\n📜 **指令列表**：")
+        print("🔍 `explore 地點` - 探索指定地點（如 `explore 螢露谷`，`explore 夢魘灣`）")
+        print("🏡 `unlock_land` - 使用七彩能量解鎖新土地（擴充培育室）")
         print("📜 `list` - 查看持有生物")
-        print("📜 `resource` -  查看持有資源")
+        print("📜 `resource` - 查看持有資源")
         print("❤️ `breed A B` - 讓第 A 和 B 隻生物繁殖（例如 `breed 1 2`）")
         print("🔥 `merge A B` - 讓第 A 和 B 隻生物合體（例如 `merge 1 2`）")
-        print("🔍 `explore` - 探索螢露谷")
         print("❌ `exit` - 離開遊戲")
