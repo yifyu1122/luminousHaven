@@ -41,7 +41,7 @@ while True:
     print("🔍 `explore` - 探索螢露谷")
     print("❌ `exit` - 離開遊戲")
 
-    command = input("\n請輸入指令：").strip().lower()
+    command = input("\n請輸入指令：").strip().lower() 
 
     if command == "list":
         player.list_creatures()
