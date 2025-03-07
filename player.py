@@ -153,8 +153,8 @@ class Player:
         print(f"⚡ {creature1.name}（{creature1.color}） 吞噬了 {creature2.name}（{creature2.color}）！")
         
         # 增加能量 #
-        creature1.energy += creature2.energy * 0.2
-        creature1.energy_rate += creature2.energy * 0.2  
+        creature1.energy += min(creature2.energy * 0.2, 10)
+        creature1.energy_rate += min(creature2.energy * 0.2, 10)  
 
         print(f"🔥 {creature2.name}（{creature2.color}） 被吞噬，從庫存中移除！")
         self.inventory.remove(creature2)  
@@ -201,15 +201,16 @@ class Player:
             rewards = ["夢魘之塵", "夢魘精華", "暗影結晶"]
             special_creature = ("夢魘貓", ["綠", "藍", "紫"], 0.1)  # 10% 機率獲得
 
-        reward = random.choice(rewards)
+            # 保底獎勵
+        base_reward = random.choice(rewards)
+        self.resources[base_reward] += 1
+        print(f"🎉 你成功探索 {location}，獲得了 **{base_reward}**！")
 
-        # 確保 `self.resources` 內有這個資源
-        if reward in self.resources:
-            self.resources[reward] += 1
-        else:
-            self.resources[reward] = 1  # 若沒有該資源則初始化
-
-        print(f"🎉 你成功探索 {location}，獲得了 **{reward}**！")
+        # 額外獎勵
+        if random.random() < 0.5:  # 50% 機率獲得額外資源
+            extra_reward = random.choice(rewards)
+            self.resources[extra_reward] += 1
+            print(f"✨ 額外獎勵：你獲得了 **{extra_reward}**！")
 
         # 可能遇到特殊生物
         if random.random() < special_creature[2]:
@@ -222,3 +223,6 @@ class Player:
         for creature in self.inventory:
             creature.energy += creature.energy_rate
             print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
+            creature.drop_gem()
+            
+            

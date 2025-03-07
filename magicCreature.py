@@ -1,6 +1,6 @@
 import random
 import player
-
+#寶石沒掉 產速太快
 # 定義顏色遺傳規則
 COLOR_MIX_RULES = {
     ("紅", "黃"): [("橙", 60), ("紅", 15), ("黃", 15),("粉", 10)],
@@ -8,7 +8,7 @@ COLOR_MIX_RULES = {
     ("黃", "藍"): [("綠", 70), ("黃", 15), ("藍", 15)],
     ("橙", "紫"): [("粉", 60), ("橙", 20), ("紫", 20)],
     ("紅", "綠"): [("黃", 40), ("橙", 40), ("紅", 20)],
-    ("藍", "綠"): [("綠", 70), ("藍", 20),("粉", 10)],
+    ("藍", "綠"): [("綠", 70), ("藍", 20), ("粉", 10)],
     ("紅", "橙"): [("橙", 50), ("紅", 30), ("黃", 20)],
     ("紅", "紫"): [("粉", 30), ("紫", 40), ("紅", 30)],
     ("黃", "綠"): [("黃", 50), ("綠", 50), ("橙", 20)],
@@ -26,7 +26,13 @@ class MagicCreature:
         self.color = color  # 這隻生物的顏色
         self.energy = energy  # 當前能量
         self.energy_rate = energy_rate  # 產能速度
-        self.evolved = False  # 是否進化
+        self.player = player.Player()
+    
+    def generate_energy(self):
+        """生物自動產生能量，並檢查是否應該掉落寶石"""
+        self.energy += self.energy_rate
+        print(f"🔋 {self.name}（{self.color}） 能量 +{self.energy_rate}！目前能量：{self.energy}")
+        self.drop_gem()
         
     def breed(self, partner):
         """與另一隻相同品種的生物繁殖"""
@@ -56,7 +62,8 @@ class MagicCreature:
             gem_name = f"{self.color}寶石"
             print(f"💎 {self.name}（{self.color}） 能量過剩，掉落了一顆 {gem_name}！")
             self.energy -= 100  # 扣除能量
-            player.resources[gem_name] = player.resources.get(gem_name, 0) + 1  # 將寶石加入玩家資源
+            self.player.resources[gem_name] = self.player.resources.get(gem_name, 0) + 1  # 增加對應寶石數量
+            print(f"🌟 你現在擁有 {self.player_instance.resources[gem_name]} 顆 {gem_name}！")
 
     
 
