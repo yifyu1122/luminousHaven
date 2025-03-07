@@ -187,14 +187,3 @@ class Player:
         for creature in self.inventory:
             creature.energy += creature.energy_rate
             print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
-
- 
-        """顯示幫助信息"""
-        print("\n📜 **指令列表**：")
-        print("🔍 `explore 地點` - 探索指定地點（如 `explore 螢露谷`，`explore 夢魘灣`）")
-        print("🏡 `unlock_land` - 使用七彩能量解鎖新土地（擴充培育室）")
-        print("📜 `list` - 查看持有生物")
-        print("📜 `resource` - 查看持有資源")
-        print("❤️ `breed A B` - 讓第 A 和 B 隻生物繁殖（例如 `breed 1 2`）")
-        print("🔥 `merge A B` - 讓第 A 和 B 隻生物合體（例如 `merge 1 2`）")
-        print("❌ `exit` - 離開遊戲")
