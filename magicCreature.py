@@ -49,15 +49,7 @@ class MagicCreature:
         print(f"🍼 {self.name}（{self.color}） 和 {partner.name}（{partner.color}）生出了一隻 {new_creature.color} 色的 {new_creature.name}！")
         return new_creature
 
-    def evolve(self):
-        """進化 & 解鎖新區域"""
-        if self.rainbow_energy >= 1:
-            print("✨ 你使用七彩能量解鎖新區域！✨")
-            self.rainbow_energy -= 1  # 消耗能量
-        else:
-            print("❌ 你沒有足夠的七彩能量，無法進化！")
 
-    def display_info(self):
         """顯示生物資訊"""
         status = "（已進化）" if self.evolved else ""
         print(f"名稱：{self.name} | 顏色：{self.color} | 魔法能量：{self.energy} {status}")
