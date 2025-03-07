@@ -1,4 +1,5 @@
 import random
+from player import player
 
 # 定義顏色遺傳規則
 COLOR_MIX_RULES = {
@@ -49,7 +50,14 @@ class MagicCreature:
         print(f"🍼 {self.name}（{self.color}） 和 {partner.name}（{partner.color}）生出了一隻 {new_creature.color} 色的 {new_creature.name}！")
         return new_creature
 
+    def drop_gem(self):
+        """當生物能量超過 100，掉落對應顏色的寶石"""
+        if self.energy >= 100:
+            gem_name = f"{self.color}寶石"
+            print(f"💎 {self.name}（{self.color}） 能量過剩，掉落了一顆 {gem_name}！")
+            self.energy -= 100  # 扣除能量
+            player.resources[gem_name] = player.resources.get(gem_name, 0) + 1  # 將寶石加入玩家資源
 
-        """顯示生物資訊"""
-        status = "（已進化）" if self.evolved else ""
-        print(f"名稱：{self.name} | 顏色：{self.color} | 魔法能量：{self.energy} {status}")
+    
+
+
