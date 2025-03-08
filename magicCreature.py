@@ -21,20 +21,23 @@ COLOR_MIX_RULES = {
 }
 
 class MagicCreature:
-    def __init__(self, name, color, energy, energy_rate):
+    def __init__(self, name, color, energy, energy_rate, player):
         self.name = name
         self.color = color  # 這隻生物的顏色
         self.energy = energy  # 當前能量
         self.energy_rate = energy_rate  # 產能速度
-        self.player = player.Player()
+        self.player = player
+    
+    def __str__(self):
+        return f"{self.name}"
     
     def generate_energy(self):
         """生物自動產生能量，並檢查是否應該掉落寶石"""
         self.energy += self.energy_rate
-        print(f"🔋 {self.name}（{self.color}） 能量 +{self.energy_rate}！目前能量：{self.energy}")
+        print(f"🔋 {self}） 能量 +{self.energy_rate}！目前能量：{self.energy}")
         self.drop_gem()
         
-    def breed(self, partner):
+    def breed(self, partner, player):
         """與另一隻相同品種的生物繁殖"""
         if self.name != partner.name:
             print(f"❌ {self.name} 和 {partner.name} 不是同品種，無法繁殖！")
@@ -52,18 +55,24 @@ class MagicCreature:
         else:
             new_color = random.choice(color_pair)  # 沒對應規則時，隨機選擇雙親顏色
 
-        new_creature = MagicCreature(self.name, new_color, 50, 10)
+        # **✅ 修正：新增 `player` 參數**
+        new_creature = MagicCreature(self.name, new_color, 50, 10, player)
         print(f"🍼 {self.name}（{self.color}） 和 {partner.name}（{partner.color}）生出了一隻 {new_creature.color} 色的 {new_creature.name}！")
         return new_creature
 
+
+
     def drop_gem(self):
         """當生物能量超過 100，掉落對應顏色的寶石"""
-        if self.energy >= 100:
+        while self.energy >= 100:
             gem_name = f"{self.color}寶石"
             print(f"💎 {self.name}（{self.color}） 能量過剩，掉落了一顆 {gem_name}！")
             self.energy -= 100  # 扣除能量
-            self.player.resources[gem_name] = self.player.resources.get(gem_name, 0) + 1  # 增加對應寶石數量
-            print(f"🌟 你現在擁有 {self.player_instance.resources[gem_name]} 顆 {gem_name}！")
+
+            # ✅ 確保 `self.player.resources` 是來自 `Player` 類的
+            self.player.resources[gem_name] = self.player.resources.get(gem_name, 0) + 1
+            print(f"🌟 你現在擁有 {self.player.resources[gem_name]} 顆 {gem_name}！")
+
 
     
 

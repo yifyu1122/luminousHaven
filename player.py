@@ -25,14 +25,35 @@ class Player:
         self.max_creatures = 10
         self.unlocked_lands = 0
 
-    def add_creature(self, creature):
-        """新增魔法生物到持有列表（受限於可容納數量）"""
+    def add_creature(self, creature_name, color):
+        """新增魔法生物到持有列表"""
         if len(self.inventory) >= self.max_creatures:
             print("❌ 培育室已滿，無法新增生物！請先釋放或合併現有生物。")
             return
         
-        self.inventory.append(creature)
-        print(f"✅ {creature.name}（{creature.color}） 加入培育室！目前數量：{len(self.inventory)}/{self.max_creatures}")
+        # 確保所有生物名稱統一（去除空格、固定格式）
+        normalized_name = creature_name.strip()
+
+        new_creature = MagicCreature(normalized_name, color, 50, 10, self)
+        self.inventory.append(new_creature)
+        print(f"✅ {new_creature.name}（{new_creature.color}） 加入培育室！目前數量：{len(self.inventory)}/{self.max_creatures}")
+    
+    def synthesize_gem(self):
+        """合成七彩寶石，需要集齊 7 種顏色的寶石"""
+        required_gems = ["紅寶石", "橙寶石", "黃寶石", "綠寶石", "藍寶石", "紫寶石", "粉寶石"]
+
+        # 檢查是否擁有每種寶石至少 1 顆
+        if all(self.resources.get(gem, 0) > 0 for gem in required_gems):
+            print("🌈 你集齊了七種顏色的寶石，並成功合成了一顆 **七彩寶石**！")
+
+            # 消耗 1 顆每種顏色的寶石
+            for gem in required_gems:
+                self.resources[gem] -= 1
+            
+            # 增加 1 顆七彩寶石
+            self.resources["七彩寶石"] = self.resources.get("七彩寶石", 0) + 1
+        else:
+            print("❌ 你的寶石顏色尚未集齊，無法合成七彩寶石！")
 
     def unlock_land(self):
         """使用七彩寶石解鎖新的土地，擴建培育室，並在首次解鎖時獲得夢魘貓（黃）"""
@@ -49,7 +70,7 @@ class Player:
         # 第一次解鎖土地時，獲得夢魘貓（黃）並解鎖新地圖
         if self.unlocked_lands == 1:
             new_creature = MagicCreature("夢魘貓", "黃", 50, 10)
-            self.add_creature(new_creature)
+            self.add_creature(new_creature, "黃")
             print("✨ 你發現了一隻 **夢魘貓（黃）**，並成功將牠帶回培育室！")
             print("🌙 你解鎖了一個新的探索地點：**夢魘灣**！")
 
@@ -92,29 +113,35 @@ class Player:
         parent1 = self.inventory[index1 - 1]
         parent2 = self.inventory[index2 - 1]
 
-        if parent1.name != parent2.name:
-            print(f"❌ {parent1.name} 和 {parent2.name} 不是同品種，無法繁殖！")
+        # **確保名稱統一後再比對**
+        parent1_name = parent1.name.strip()
+        parent2_name = parent2.name.strip()
+
+        print(f"🐣 嘗試繁殖：{parent1_name}（{parent1.color}） 和 {parent2_name}（{parent2.color}）")
+
+        if parent1_name != parent2_name:
+            print(f"❌ {parent1_name} 和 {parent2_name} 不是同品種，無法繁殖！")
             return
 
-        # 根據品種決定繁殖所需資源
-        if parent1.name == "星光螢火蟲":
+        # **根據品種決定繁殖所需資源**
+        if parent1_name == "星光螢火蟲":
             required_resources = ["螢露蜜", "螢露土", "螢露水"]
-        elif parent1.name == "夢魘貓":
+        elif parent1_name == "夢魘貓":
             required_resources = ["夢魘之塵", "夢魘精華", "暗影結晶"]
         else:
-            print(f"❌ {parent1.name} 目前無法繁殖！")
+            print(f"❌ {parent1_name} 目前無法繁殖！")
             return
 
-        # 檢查是否擁有足夠的繁殖資源
+        # **檢查是否擁有足夠的繁殖資源**
         missing_resources = [res for res in required_resources if self.resources.get(res, 0) < 1]
         
         if missing_resources:
             print(f"❌ 無法繁殖！缺少以下資源：{', '.join(missing_resources)}")
             return
 
-        # 執行繁殖
-        child = parent1.breed(parent2)
-        
+        # **✅ 修正：傳入 `self` 作為 `player` 參數**
+        child = parent1.breed(parent2, self)
+
         if child:
             # 繁殖成功，扣除資源
             for res in required_resources:
@@ -122,6 +149,9 @@ class Player:
             
             self.inventory.append(child)
             print(f"🍼 {child.name}（{child.color}） 誕生了！你已消耗 1 份「{'、'.join(required_resources)}」。")
+
+
+
 
     def merge_creatures(self, index1, index2): 
         """讓兩隻魔法生物合體，提升主體能量，但不直接進化"""
@@ -196,12 +226,16 @@ class Player:
         # 探索獎勵
         if location == "螢露谷":
             rewards = ["螢露蜜", "螢露土", "螢露水"]
-            special_creature = ("星光螢火蟲", ["綠", "藍", "紫"], 0.1)  # 10% 機率獲得
+            special_creature_name = "星光螢火蟲"
+            special_creature_colors = ["綠", "藍", "紫"]
+            special_creature_chance = 0.3
         elif location == "夢魘灣":
             rewards = ["夢魘之塵", "夢魘精華", "暗影結晶"]
-            special_creature = ("夢魘貓", ["綠", "藍", "紫"], 0.1)  # 10% 機率獲得
+            special_creature_name = "夢魘貓"
+            special_creature_colors = ["綠", "藍", "紫"]
+            special_creature_chance = 0.3
 
-            # 保底獎勵
+        # **保底獎勵**
         base_reward = random.choice(rewards)
         self.resources[base_reward] += 1
         print(f"🎉 你成功探索 {location}，獲得了 **{base_reward}**！")
@@ -213,16 +247,18 @@ class Player:
             print(f"✨ 額外獎勵：你獲得了 **{extra_reward}**！")
 
         # 可能遇到特殊生物
-        if random.random() < special_creature[2]:
-            new_color = random.choice(special_creature[1])
-            new_creature = MagicCreature(special_creature[0], new_color, 50, 10)
-            self.add_creature(new_creature)
-            print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {special_creature[0]}**，並成功帶回培育室！✨")
+        if random.random() < special_creature_chance:
+            new_color = random.choice(special_creature_colors)
+            # 確保名稱統一
+            normalized_creature_name = special_creature_name.strip()
+            self.add_creature(normalized_creature_name, new_color)
+            print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {normalized_creature_name}**，並成功帶回培育室！✨")
 
         # 離開期間生物會產生能量
         for creature in self.inventory:
             creature.energy += creature.energy_rate
             print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
             creature.drop_gem()
+
             
             
