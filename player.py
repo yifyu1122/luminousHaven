@@ -9,9 +9,11 @@ class Player:
             "螢露蜜": 0,
             "螢露土": 0,
             "螢露水": 0,
+            "夢魘果實": 0,
             "夢魘之塵": 0,
             "夢魘精華": 0,
-            "暗影結晶": 0,
+            "星輝露滴": 0,
+            "惡夢碎片": 0, 
             "七彩寶石": 0,
             "紅寶石": 0,
             "橙寶石": 0,
@@ -127,7 +129,7 @@ class Player:
         if parent1_name == "星光螢火蟲":
             required_resources = ["螢露蜜", "螢露土", "螢露水"]
         elif parent1_name == "夢魘貓":
-            required_resources = ["夢魘之塵", "夢魘精華", "暗影結晶"]
+            required_resources = ["夢魘果實", "夢魘之塵", "夢魘精華"]
         else:
             print(f"❌ {parent1_name} 目前無法繁殖！")
             return
@@ -230,7 +232,7 @@ class Player:
             special_creature_colors = ["綠", "藍", "紫"]
             special_creature_chance = 0.3
         elif location == "夢魘灣":
-            rewards = ["夢魘之塵", "夢魘精華", "暗影結晶"]
+            rewards = ["夢魘果實", "夢魘之塵", "夢魘精華"]
             special_creature_name = "夢魘貓"
             special_creature_colors = ["綠", "藍", "紫"]
             special_creature_chance = 0.3
