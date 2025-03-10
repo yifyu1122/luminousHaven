@@ -1,5 +1,4 @@
 import random
-import player
 # 定義顏色遺傳規則
 COLOR_MIX_RULES = {
     ("紅", "黃"): [("橙", 50), ("紅", 20), ("黃", 20), ("粉", 10)],

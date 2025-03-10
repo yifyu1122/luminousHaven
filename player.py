@@ -1,6 +1,7 @@
 import random
 import time
 from magicCreature import MagicCreature
+import village
 
 class Player:
     def __init__(self):
@@ -75,7 +76,10 @@ class Player:
             self.add_creature(new_creature, "黃")
             print("✨ 你發現了一隻 **夢魘貓（黃）**，並成功將牠帶回培育室！")
             print("🌙 你解鎖了一個新的探索地點：**夢魘灣**！")
-
+        
+        elif self.unlocked_lands == 2:
+            print("🌍 你已成功淨化 2 塊土地！繼續探索吧！")
+            print("🌙 你解鎖了一個新的探索地點：**精靈遺族的部落**！")
         else:
             print(f"🌍 你已成功淨化 {self.unlocked_lands} 塊土地！繼續探索吧！")
 
@@ -152,9 +156,6 @@ class Player:
             self.inventory.append(child)
             print(f"🍼 {child.name}（{child.color}） 誕生了！你已消耗 1 份「{'、'.join(required_resources)}」。")
 
-
-
-
     def merge_creatures(self, index1, index2): 
         """讓兩隻魔法生物合體，提升主體能量，但不直接進化"""
         
@@ -213,7 +214,7 @@ class Player:
     def explore(self, location="螢露谷"):
         """探索螢露谷或夢魘灣，獲得不同的資源或魔法生物"""
         
-        if location not in ["螢露谷", "夢魘灣"]:
+        if location not in ["螢露谷", "夢魘灣", "精靈部落"]:
             print("❌ 無效的探索地點！請選擇 `螢露谷` 或 `夢魘灣`")
             return
 
@@ -221,46 +222,53 @@ class Player:
         if location == "夢魘灣" and self.unlocked_lands < 1:
             print("❌ 你尚未解鎖「夢魘灣」！請先使用七彩寶石解鎖土地。")
             return
+        
+        if location == "精靈部落" and self.unlocked_lands < 2:
+            print("❌ 你尚未解鎖「精靈部落」！請先使用七彩寶石解鎖土地。")
+            return
 
-        print(f"🛤️ 你開始探索 {location}... ⏳（需時 1:00）")
-        time.sleep(3)  # 模擬探索時間（縮短為 3 秒）
+        if location == "精靈部落":
+            village.enter();
+        else:
+            print(f"🛤️ 你開始探索 {location}... ⏳（需時 1:00）")
+            time.sleep(3)  # 模擬探索時間（縮短為 3 秒）
 
-        # 探索獎勵
-        if location == "螢露谷":
-            rewards = ["螢露蜜", "螢露土", "螢露水"]
-            special_creature_name = "星光螢火蟲"
-            special_creature_colors = ["綠", "藍", "紫"]
-            special_creature_chance = 0.3
-        elif location == "夢魘灣":
-            rewards = ["夢魘果實", "夢魘之塵", "夢魘精華"]
-            special_creature_name = "夢魘貓"
-            special_creature_colors = ["綠", "藍", "紫"]
-            special_creature_chance = 0.3
+            # 探索獎勵
+            if location == "螢露谷":
+                rewards = ["螢露蜜", "螢露土", "螢露水"]
+                special_creature_name = "星光螢火蟲"
+                special_creature_colors = ["綠", "藍", "紫"]
+                special_creature_chance = 0.3
+            elif location == "夢魘灣":
+                rewards = ["夢魘果實", "夢魘之塵", "夢魘精華"]
+                special_creature_name = "夢魘貓"
+                special_creature_colors = ["綠", "藍", "紫"]
+                special_creature_chance = 0.3
 
-        # **保底獎勵**
-        base_reward = random.choice(rewards)
-        self.resources[base_reward] += 1
-        print(f"🎉 你成功探索 {location}，獲得了 **{base_reward}**！")
+            # **保底獎勵**
+            base_reward = random.choice(rewards)
+            self.resources[base_reward] += 1
+            print(f"🎉 你成功探索 {location}，獲得了 **{base_reward}**！")
 
-        # 額外獎勵
-        if random.random() < 0.5:  # 50% 機率獲得額外資源
-            extra_reward = random.choice(rewards)
-            self.resources[extra_reward] += 1
-            print(f"✨ 額外獎勵：你獲得了 **{extra_reward}**！")
+            # 額外獎勵
+            if random.random() < 0.5:  # 50% 機率獲得額外資源
+                extra_reward = random.choice(rewards)
+                self.resources[extra_reward] += 1
+                print(f"✨ 額外獎勵：你獲得了 **{extra_reward}**！")
 
-        # 可能遇到特殊生物
-        if random.random() < special_creature_chance:
-            new_color = random.choice(special_creature_colors)
-            # 確保名稱統一
-            normalized_creature_name = special_creature_name.strip()
-            self.add_creature(normalized_creature_name, new_color)
-            print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {normalized_creature_name}**，並成功帶回培育室！✨")
+            # 可能遇到特殊生物
+            if random.random() < special_creature_chance:
+                new_color = random.choice(special_creature_colors)
+                # 確保名稱統一
+                normalized_creature_name = special_creature_name.strip()
+                self.add_creature(normalized_creature_name, new_color)
+                print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {normalized_creature_name}**，並成功帶回培育室！✨")
 
-        # 離開期間生物會產生能量
-        for creature in self.inventory:
-            creature.energy += creature.energy_rate
-            print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
-            creature.drop_gem()
+            # 離開期間生物會產生能量
+            for creature in self.inventory:
+                creature.energy += creature.energy_rate
+                print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
+                creature.drop_gem()
 
             
             

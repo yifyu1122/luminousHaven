@@ -1,6 +1,5 @@
 from player import Player
 
-
 # 定義可能的顏色
 COLORS = ["紅", "橙", "黃", "綠", "藍", "紫", "粉"] 
 
@@ -72,4 +71,4 @@ while True:
         break
 
     else:
-        print("❌ 無效指令，請輸入 `explore`, `unlock_land`, `list`, `resource`, `breed`, `merge` 或 `exit`")
+        print("❌ 無效指令，請重新輸入")
