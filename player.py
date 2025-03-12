@@ -13,8 +13,8 @@ class Player:
             "夢魘果實": 0,
             "夢魘之塵": 0,
             "夢魘精華": 0,
-            "星輝露滴": 0,
-            "惡夢碎片": 0, 
+            "星輝之粉": 0,
+            "夢魘貓毛": 0, 
             "七彩寶石": 0,
             "紅寶石": 0,
             "橙寶石": 0,
@@ -27,6 +27,9 @@ class Player:
         # 培育室最大容量
         self.max_creatures = 10
         self.unlocked_lands = 0
+        self.exploration_count = {"螢露谷": 0, "夢魘灣": 0} 
+        self.polluted_lands = {"螢露谷": False, "夢魘灣": False}  
+        self.purification_level = 1
 
     def add_creature(self, creature_name, color):
         """新增魔法生物到持有列表"""
@@ -213,9 +216,14 @@ class Player:
     
     def explore(self, location="螢露谷"):
         """探索螢露谷或夢魘灣，獲得不同的資源或魔法生物"""
+
         
         if location not in ["螢露谷", "夢魘灣", "精靈部落"]:
             print("❌ 無效的探索地點！請選擇 `螢露谷` 或 `夢魘灣`")
+            return
+
+        if self.polluted_lands[location]:
+            print(f"❌ {location} 已被汙染，無法探索！請使用七彩寶石進行淨化。")
             return
 
         # 夢魘灣只有當玩家解鎖第一塊土地後才可探索
@@ -263,6 +271,13 @@ class Player:
                 normalized_creature_name = special_creature_name.strip()
                 self.add_creature(normalized_creature_name, new_color)
                 print(f"✨ 你在探索中遇見了一隻 **{new_color} 色的 {normalized_creature_name}**，並成功帶回培育室！✨")
+            
+            self.exploration_count[location] += 1
+            print(f"🔍 {location} 已探索 {self.exploration_count[location]} 次。")    
+            
+            if self.exploration_count[location] % 50 == 0:
+                self.polluted_lands[location] = True
+                print(f"⚠️ {location} 已被汙染，無法再探索！請使用七彩寶石進行淨化。")
 
             # 離開期間生物會產生能量
             for creature in self.inventory:
@@ -270,5 +285,26 @@ class Player:
                 print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate} 點能量！")
                 creature.drop_gem()
 
-            
+    def purify_land(self, location):
+        """使用七彩寶石來淨化被汙染的土地"""
+        if location not in self.polluted_lands:
+            print("❌ 無效的地點！")
+            return
+        
+        if not self.polluted_lands[location]:
+            print(f"✅ {location} 沒有被汙染，無需淨化。")
+            return
+
+        # 需要對應等級的七彩寶石
+        required_purification = self.pollution_levels[location]
+        
+        if self.resources.get("七彩寶石", 0) < required_purification:
+            print(f"❌ 七彩寶石不足！需要 {required_purification} 顆七彩寶石來淨化 {location}。")
+            return
+        
+        # 消耗七彩寶石
+        self.resources["七彩寶石"] -= required_purification
+        self.polluted_lands[location] = False
+        print(f"🌱 你使用 {required_purification} 顆七彩寶石成功淨化 {location}，可以再次探索！")
+     
             

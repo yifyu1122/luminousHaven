@@ -1,11 +1,22 @@
 import time
 import player
+import random
 import script.scriptVillage as scriptVillage
+import script.shopLana as shopLana
+import script.plantLuna as plantLuna
+import script.magicNas as magicNas
+import script.questHwasa as questHwasa
 
 class Village:
     def __init__(self):
         self.money = 0
         self.gossip = 0
+        self.unlocked_features = {
+            "shop": False,  # 商店
+            "greenhouse": False,  # 溫室
+            "magic": False,  # 魔法學習
+            "quests": False,  # 任務系統
+        }
         
     def enter(self):
         print("\n🏞 **前往部落中...**")
@@ -20,10 +31,21 @@ class Village:
         while True:
             print("\n📜 **指令列表**：")
             print("`talk` - 與隨機部落精靈對話")
+            if self.unlocked_features["shop"] == True:
+                print("🛍 `shop` - 進入拉娜的寶石交易所")
+            if self.unlocked_features["greenhouse"] == True:
+                print("🌿 `greenhouse` - 進入露娜的溫室")
+            if self.unlocked_features["magic"] == True:
+                print("🔮 `magic` - 進入娜絲的魔法實驗室")
+            if self.unlocked_features["quests"] == True:
+                print("🏡 `quests` - 與村長華莎對話，接受任務")
             print("🔙 `exit` - 離開精靈遺族部落")
             command = input("\n請輸入指令：").strip().lower()
-            if command == "talk":
-                self.talk()
+            
+            if command.startswith("talk"):
+                parts = command.split()
+                npc_name = parts[1] if len(parts) > 1 else None  # 玩家可以選擇 NPC，否則隨機
+                self.talk(npc_name)
                 count+=1
             elif command == "exit":
                 print("👋 離開精靈遺族部落！")
@@ -34,10 +56,61 @@ class Village:
                     print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate*count} 點能量！")
                     creature.drop_gem()
             else:
-                print("❌ 無效指令，請輸入 `talk` 或 `exit`")
-    def talk(self):
+                print("❌ 無效指令，請重新輸入")
+                
+    def talk(self, npc_name=None):
         if self.gossip == 0:
-           scriptVillage.talk1() 
-           self.gossip += 1
-        elif(self.gossip>=1):
-           """隨機找一位精靈溝通，溝通後解鎖對應面板，如商店、農場等"""
+            scriptVillage.talk1() 
+            self.gossip += 1
+        else:
+            """隨機找一位精靈溝通，溝通後解鎖對應面板，如商店、農場等"""
+            npcs = {
+                "拉娜": "商人",
+                "露娜": "園藝師",
+                "娜絲": "魔法師",
+                "華莎": "村長",
+                "普通精靈": "村民"
+            }
+
+            if npc_name is None:
+                npc_name = random.choice(list(npcs.keys()))  # 隨機選擇一位精靈
+
+            print(f"\n🧝 你遇見了一位精靈：{npc_name}（{npcs[npc_name]}）")
+
+            if npc_name == "拉娜":
+                self.talk_to_lana()
+            elif npc_name == "露娜":
+                self.talk_to_luna()
+            elif npc_name == "娜絲":
+                self.talk_to_nas()
+            elif npc_name == "華莎":
+                self.talk_to_hwasa()
+            else:
+                self.talk_to_villager()
+                
+            self.gossip += 1
+
+    def talk_to_lana(self):
+        """與拉娜對話，解鎖商店"""
+        shopLana.shop()
+
+    def talk_to_luna(self):
+        """與露娜對話，解鎖溫室與種植系統"""
+        plantLuna.plant()
+
+    def talk_to_nas(self):
+        """與娜絲對話，學習魔法並提升淨化等級"""
+        magicNas.magic()
+
+    def talk_to_hwasa(self):
+        """與村長華莎對話，獲取任務與獎勵"""
+        questHwasa.quest()
+
+    def talk_to_villager(self):
+        """與普通精靈對話，沒有特殊功能"""
+        dialogue = [
+            "🌿 普通精靈：「最近的天氣真不錯，希望污染不會擴散到這裡……」",
+            "🧝 普通精靈：「你是從哪裡來的？我從沒見過像你這樣的生物。」",
+            "🧙 普通精靈：「如果你有多餘的魔法資源，或許可以考慮幫助村莊。」"
+        ]
+        print(random.choice(dialogue))       

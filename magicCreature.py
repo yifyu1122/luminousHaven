@@ -19,8 +19,8 @@ COLOR_MIX_RULES = {
 }
 
 SPECIAL_DROPS = {
-    "星光螢火蟲": "星輝露滴",
-    "夢魘貓": "惡夢碎片",
+    "星光螢火蟲": "星輝之粉",
+    "夢魘貓": "夢魘貓毛",
 }
 
 class MagicCreature:
