@@ -1,11 +1,12 @@
 import random
 import time
 from magicCreature import MagicCreature
-import village
+from village import Village
 
 class Player:
     def __init__(self):
         self.inventory = []
+        self.village = Village()
         self.resources = {
             "螢露蜜": 0,
             "螢露土": 0,
@@ -23,6 +24,7 @@ class Player:
             "藍寶石": 0,
             "紫寶石": 0,
             "透明寶石": 0,
+            "精靈幣": 0
         }
         # 培育室最大容量
         self.max_creatures = 10
@@ -236,7 +238,7 @@ class Player:
             return
 
         if location == "精靈部落":
-            village.enter();
+            Village.enter();
         else:
             print(f"🛤️ 你開始探索 {location}... ⏳（需時 1:00）")
             time.sleep(3)  # 模擬探索時間（縮短為 3 秒）
