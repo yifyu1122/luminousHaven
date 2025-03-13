@@ -77,14 +77,12 @@ class Player:
 
         # 第一次解鎖土地時，獲得夢魘貓（黃）並解鎖新地圖
         if self.unlocked_lands == 1:
-            new_creature = MagicCreature("夢魘貓", "黃", 50, 10, self)
-            self.add_creature(new_creature, "黃")
-            print("✨ 你發現了一隻 **夢魘貓（黃）**，並成功將牠帶回培育室！")
+            self.add_creature("夢魘貓", "紅")
+            print("✨ 你發現了一隻 **夢魘貓（紅）**，並成功將牠帶回培育室！")
             print("🌙 你解鎖了一個新的探索地點：**夢魘灣**！")
-        
-        elif self.unlocked_lands == 2:
-            print("🌍 你已成功淨化 2 塊土地！繼續探索吧！")
             print("🌙 你解鎖了一個新的探索地點：**精靈遺族的部落**！")
+        
+            
         else:
             print(f"🌍 你已成功淨化 {self.unlocked_lands} 塊土地！繼續探索吧！")
 
@@ -233,7 +231,7 @@ class Player:
             print("❌ 你尚未解鎖「夢魘灣」！請先使用七彩寶石解鎖土地。")
             return
         
-        if location == "精靈部落" and self.unlocked_lands < 2:
+        if location == "精靈部落" and self.unlocked_lands < 1:
             print("❌ 你尚未解鎖「精靈部落」！請先使用七彩寶石解鎖土地。")
             return
 
@@ -249,22 +247,19 @@ class Player:
                 special_creature_name = "星光螢火蟲"
                 special_creature_colors = ["綠", "藍", "紫"]
                 special_creature_chance = 0.3
+                # **每次探索必定獲得 3 種基礎資源**
+                for reward in rewards:
+                    self.resources[reward] += 1
+                print(f"🎉 你成功探索 {location}，獲得了 **螢露蜜、螢露土、螢露水**！")
             elif location == "夢魘灣":
                 rewards = ["夢魘果實", "夢魘之塵", "夢魘精華"]
                 special_creature_name = "夢魘貓"
-                special_creature_colors = ["綠", "藍", "紫"]
+                special_creature_colors = ["橙", "黃", "紫"]
                 special_creature_chance = 0.3
+                for reward in rewards:
+                    self.resources[reward] += 1
+                print(f"🎉 你成功探索 {location}，獲得了 **夢魘果實、夢魘之塵、夢魘精華**！")
 
-            # **保底獎勵**
-            base_reward = random.choice(rewards)
-            self.resources[base_reward] += 1
-            print(f"🎉 你成功探索 {location}，獲得了 **{base_reward}**！")
-
-            # 額外獎勵
-            if random.random() < 0.5:  # 50% 機率獲得額外資源
-                extra_reward = random.choice(rewards)
-                self.resources[extra_reward] += 1
-                print(f"✨ 額外獎勵：你獲得了 **{extra_reward}**！")
 
             # 可能遇到特殊生物
             if random.random() < special_creature_chance:

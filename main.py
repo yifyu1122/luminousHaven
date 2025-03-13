@@ -12,11 +12,11 @@ player = Player()
 
 player.add_creature("星光螢火蟲", "紅")
 player.add_creature("星光螢火蟲", "黃")
-player.add_creature("夢魘貓", "紅")
+player.add_creature("夢魘貓", "藍")
 
 while True:
     print("\n📜 **指令列表**：")
-    print("🔍 `explore 地點` - 探索指定地點（如 `explore 螢露谷`，`explore 夢魘灣`）")    
+    print("🔍 `explore 地點` - 探索指定地點（如 `explore 螢露谷`）")    
     print("📜 `list` - 查看持有生物")
     print("📜 `resource` - 查看持有資源")
     print("❤️ `breed A B` - 讓第 A 和 B 隻生物繁殖（例如 `breed 1 2`）")
