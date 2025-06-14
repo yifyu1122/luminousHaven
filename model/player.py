@@ -1,8 +1,8 @@
 import random
 import time
-from magicCreature import MagicCreature
+from model.magicCreature import MagicCreature
 
-from resourceManager import ResourceManager
+from model.resourceManager import ResourceManager
 
 class Player:
     def __init__(self):

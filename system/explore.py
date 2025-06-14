@@ -1,6 +1,6 @@
 import time
 import random
-from village import Village
+from system.village import Village
 def explore(player, location="螢露谷"):
     """探索螢露谷或夢魘灣，獲得不同的資源或魔法生物"""
     if len(player.inventory) >= player.max_creatures:

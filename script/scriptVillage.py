@@ -1,5 +1,5 @@
 import time
-import player
+import model.player as player
 class ScriptVillage:
     def __init__(self):
         self.likeness = 0 

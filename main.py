@@ -1,7 +1,7 @@
-from player import Player
-import breed
-import merge
-import explore
+from model.player import Player
+import system.breed as breed
+import system.merge as merge
+import system.explore as explore
 
 def game_intro():
     """遊戲開場說明"""
