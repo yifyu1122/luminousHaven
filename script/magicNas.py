@@ -1,24 +1,38 @@
+from .baseNPC import BaseNPC
 import time
 
-class MagicNas:
+class MagicNas(BaseNPC):
+    """娜絲的魔法塔，提供學習魔法和淨化土地的功能"""
     def __init__(self, player):
-        self.gossip = 0
-        self.player = player
+        super().__init__(player, name="娜絲", role="魔法師")
 
-    def magic(self):
-        """與娜絲對話，學習魔法並提升淨化等級"""
+    def get_initial_dialogue(self):
+        return [
+            "\n**白髮精靈**：「你好呀~人類我是魔法師娜絲。」",
+            "**娜絲**：「如果你想學習真正的魔法，得先證明你值得。」",
+            "**娜絲**：「學魔法可不是免費的，需要 **5000 精靈幣** 和一些魔法資源。」"
+        ]
+
+    def get_repeat_dialogue(self):
+        return ["\n🔮 **娜絲**：「需要我教你魔法嗎？」"]
+
+    def handle_interaction(self):
+        """處理魔法塔互動"""
+        # 顯示對話
         if self.gossip == 0:
-            print("\n🔮 **白髮精靈**：「你好呀~人類我是魔法師娜絲。」")
-            print("🌌 **娜絲**：「如果你想學習真正的魔法，得先證明你值得。」")
-            print("✨ **娜絲**：「學魔法可不是免費的，需要 **5000 精靈幣** 和一些魔法資源。」")
-            self.gossip += 1
-        
+            for line in self.get_initial_dialogue():
+                print(line)
+        else:
+            for line in self.get_repeat_dialogue():
+                print(line)
+
+        # 顯示選單
         print("\n🔹 **選擇行動** 🔹")
         print("`1` - 學習魔法（提升淨化等級，需要 5000 精靈幣 + 魔法資源）")
         print("`2` - 詢問娜絲關於污染的事")
         print("`3` - 退出")
 
-        choice = input("👉 你的選擇是？（輸入數字 1 / 2 / 3）：").strip()
+        choice = input("\n👉 你的選擇是？（輸入數字 1 / 2 / 3）：").strip()
 
         if choice == "1":
             self.learn_magic()
@@ -26,11 +40,17 @@ class MagicNas:
             self.ask_about_pollution()
         else:
             print("🚪 你離開了娜絲的魔法塔。")
+            
+        self.gossip += 1
+
+    def magic(self):
+        """原有的魔法功能保持不變，但現在透過 handle_interaction 調用"""
+        self.handle_interaction()
 
     def learn_magic(self):
         """學習魔法，提高淨化等級"""
         required_coins = 5000
-        required_resources = ["夢魘精華", "暗影結晶"]
+        required_resources = ["星輝之粉", "夢魘貓毛"]
 
         if self.player.village.unlocked_features["magic"]:
             print("🔮 **娜絲**：「你已經學會魔法了！現在只能透過 **實戰** 來提升能力。」")

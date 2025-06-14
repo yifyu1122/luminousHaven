@@ -24,12 +24,11 @@ SPECIAL_DROPS = {
 }
 
 class MagicCreature:
-    def __init__(self, name, color, energy, energy_rate, player):
+    def __init__(self, name, color, energy, energy_rate):
         self.name = name
         self.color = color  # 這隻生物的顏色
         self.energy = energy  # 當前能量
         self.energy_rate = energy_rate  # 產能速度
-        self.player = player
     
     def __str__(self):
         return f"{self.name}"
@@ -58,30 +57,24 @@ class MagicCreature:
         else:
             new_color = random.choice(color_pair)  # 沒對應規則時，隨機選擇雙親顏色
 
-        # **✅ 修正：新增 `player` 參數**
+
         new_creature = MagicCreature(self.name, new_color, 50, 10, player)
         print(f"🍼 {self.name}（{self.color}） 和 {partner.name}（{partner.color}）生出了一隻 {new_creature.color} 色的 {new_creature.name}！")
         return new_creature
 
     def drop_gem(self):
         """當生物能量超過 100，掉落對應顏色的寶石，並有機率掉落特殊物品"""
+        drops = []
         while self.energy >= 100:
-            gem_name = f"{self.color}寶石"
-            print(f"💎 {self.name}（{self.color}） 能量過剩，掉落了一顆 {gem_name}！")
+            gem_name = f"{self.color}寶石"         
             self.energy -= 100  # 扣除能量
-
-            # ✅ 確保 `self.player.resources` 是來自 `Player` 類的
-            self.player.resources[gem_name] = self.player.resources.get(gem_name, 0) + 1
-            print(f"🌟 你現在擁有 {self.player.resources[gem_name]} 顆 {gem_name}！")
+            drops.append(gem_name)
+            print(f"💎 {self.name}（{self.color}） 能量過剩，掉落了一顆 {gem_name}！")
 
             # **🔮 新增特殊掉落機率（20%）**
             if self.name in SPECIAL_DROPS and random.random() < 0.2:  # 20% 機率掉落
                 special_item = SPECIAL_DROPS[self.name]
-                self.player.resources[special_item] = self.player.resources.get(special_item, 0) + 1
+                drops.append(special_item)
                 print(f"✨ {self.name} 除了寶石，還掉落了 **{special_item}**！")
 
-
-
-    
-
-
+        return drops

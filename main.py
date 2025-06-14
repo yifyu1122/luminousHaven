@@ -10,13 +10,15 @@ game_intro()
 
 player = Player()
 
+player.initialize_village()
+
 player.add_creature("星光螢火蟲", "紅")
 player.add_creature("星光螢火蟲", "黃")
 player.add_creature("夢魘貓", "藍")
 
 while True:
     print("\n📜 **指令列表**：")
-    print("🔍 `explore 地點` - 探索指定地點（如 `explore 螢露谷`）")    
+    print("🔍 `explore` - 探索獲取資源")    
     print("📜 `list` - 查看持有生物")
     print("📜 `resource` - 查看持有資源")
     print("❤️ `breed A B` - 讓第 A 和 B 隻生物繁殖（例如 `breed 1 2`）")
@@ -55,13 +57,28 @@ while True:
         except (ValueError, IndexError):
             print("❌ 指令格式錯誤！請使用 `merge A B`，例如 `merge 1 2`")
 
-    elif command.startswith("explore"):
+    elif command.startswith("explore"):        
         try:
-            parts = command.split()
-            location = parts[1] if len(parts) > 1 else "螢露谷"  # 預設探索螢露谷
-            player.explore(location)
-        except IndexError:
-            print("❌ 指令格式錯誤！請使用 `explore 螢露谷` 或 `explore 夢魘灣`")
+            if player.unlocked_lands >= 1:
+                print("\n🌍 你可以探索以下地點：")
+                print("1. 探索螢露谷")
+                print("2. 探索夢魘灣")
+                print("3. 探索精靈部落")
+
+                choice = input("\n👉 你想探索哪裡？（輸入 1 / 2 / 3）：").strip()
+
+                if choice == "1":
+                    player.explore("螢露谷")
+                elif choice == "2":
+                    player.explore("夢魘灣")
+                elif choice == "3":
+                    player.village.enter() 
+                else:
+                    print("❌ 無效選項，請輸入 1 / 2 / 3。")
+            else:
+                player.explore("螢露谷")
+        except Exception as e:
+            print("❌ 指令格式錯誤！請使用 `explore `")
 
     elif command == "exit":
         print("👋 遊戲結束！")
