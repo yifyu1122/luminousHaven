@@ -1,4 +1,7 @@
 from player import Player
+import breed
+import merge
+import explore
 
 def game_intro():
     """遊戲開場說明"""
@@ -16,7 +19,59 @@ player.add_creature("星光螢火蟲", "紅")
 player.add_creature("星光螢火蟲", "黃")
 player.add_creature("夢魘貓", "藍")
 
+commands = {
+    "list": player.list_creatures,
+    "resource": player.list_resources,
+    "synthesize": player.synthesize_gem,
+    "unlock_land": player.unlock_land,
+    "exit": lambda: print("👋 遊戲結束！")
+}
+
+def handle_breed(parts):
+    """處理繁殖指令"""
+    try:
+        parts = command.split()
+        if len(parts) != 3:
+            raise ValueError  
+        idx1, idx2 = int(parts[1]), int(parts[2]) 
+        breed.breed_creatures(idx1, idx2)
+    except (ValueError, IndexError):
+        print("❌ 指令格式錯誤！請使用 `breed A B`，例如 `breed 1 2`")
+
+def handle_merge(parts):
+    """處理合體指令"""
+    try:
+        if len(parts) != 3:
+            raise ValueError
+        idx1, idx2 = int(parts[1]), int(parts[2])
+        merge.merge_creatures(idx1, idx2)
+    except (ValueError, IndexError):
+        print("❌ 指令格式錯誤！請使用 `merge A B`，例如 `merge 1 2`")
+
+def handle_explore():
+    """處理探索指令"""
+    if player.unlocked_lands >= 1:
+        print("\n🌍 你可以探索以下地點：")
+        print("1. 探索螢露谷")
+        print("2. 探索夢魘灣")
+        print("3. 探索精靈部落")
+
+        choice = input("\n👉 你想探索哪裡？（輸入 1 / 2 / 3）：").strip()
+
+        if choice == "1":
+            explore.explore("螢露谷")
+        elif choice == "2":
+            explore.explore("夢魘灣")
+        elif choice == "3":
+            player.village.enter() 
+        else:
+            print("❌ 無效選項，請輸入 1 / 2 / 3。")
+    else:
+        explore.explore("螢露谷")
+
+
 while True:
+    # === 指令區 ===
     print("\n📜 **指令列表**：")
     print("🔍 `explore` - 探索獲取資源")    
     print("📜 `list` - 查看持有生物")
@@ -28,61 +83,24 @@ while True:
     print("❌ `exit` - 離開遊戲")
 
     command = input("\n請輸入指令：").strip().lower()
+    parts = command.split()
 
-    if command == "list":
-        player.list_creatures()
-    elif command == "resource":
-        player.list_resources()
-    elif command == "unlock_land":
-        player.unlock_land()
-    elif command == "synthesize":
-        player.synthesize_gem()
-    elif command.startswith("breed"):
-        try:
-            parts = command.split()
-            if len(parts) != 3:
-                raise ValueError  
-            idx1, idx2 = int(parts[1]), int(parts[2]) 
-            player.breed_creatures(idx1, idx2)
-        except (ValueError, IndexError):
-            print("❌ 指令格式錯誤！請使用 `breed A B`，例如 `breed 1 2`")
+    if not parts:
+        print("❌ 請輸入有效指令")
+        continue
 
-    elif command.startswith("merge"):
-        try:
-            parts = command.split()
-            if len(parts) != 3:
-                raise ValueError 
-            idx1, idx2 = int(parts[1]), int(parts[2]) 
-            player.merge_creatures(idx1, idx2)
-        except (ValueError, IndexError):
-            print("❌ 指令格式錯誤！請使用 `merge A B`，例如 `merge 1 2`")
+    cmd = parts[0]
 
-    elif command.startswith("explore"):        
-        try:
-            if player.unlocked_lands >= 1:
-                print("\n🌍 你可以探索以下地點：")
-                print("1. 探索螢露谷")
-                print("2. 探索夢魘灣")
-                print("3. 探索精靈部落")
-
-                choice = input("\n👉 你想探索哪裡？（輸入 1 / 2 / 3）：").strip()
-
-                if choice == "1":
-                    player.explore("螢露谷")
-                elif choice == "2":
-                    player.explore("夢魘灣")
-                elif choice == "3":
-                    player.village.enter() 
-                else:
-                    print("❌ 無效選項，請輸入 1 / 2 / 3。")
-            else:
-                player.explore("螢露谷")
-        except Exception as e:
-            print("❌ 指令格式錯誤！請使用 `explore `")
-
-    elif command == "exit":
-        print("👋 遊戲結束！")
+    if cmd == "exit":
+        commands["exit"]()
         break
-
+    elif cmd in commands:
+        commands[cmd]()
+    elif cmd == "breed":
+        handle_breed(parts)
+    elif cmd == "merge":
+        handle_merge(parts)
+    elif cmd == "explore":
+        handle_explore()
     else:
-        print("❌ 無效指令，請重新輸入")
+        print("❌ 無效指令")
