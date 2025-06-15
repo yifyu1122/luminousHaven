@@ -24,26 +24,14 @@ class ResourceManager:
         self.resources[item] = self.resources.get(item, 0) + amount
 
     def consume(self, item, amount=1):
+        """消耗指定數量的資源"""
         if self.resources.get(item, 0) >= amount:
             self.resources[item] -= amount
             return True
-        else:
-            return False
+        return False
 
     def get(self, item):
+        """獲取指定資源的數量"""
         return self.resources.get(item, 0)
 
-    def list_resources(self):
-        """顯示玩家持有的所有資源"""
-        # 過濾出數量大於 0 的資源
-        owned_resources = {k: v for k, v in self.resources.items() if v > 0}
 
-        if not owned_resources:
-            print("❌ 你目前沒有任何資源！")
-            return {}
-
-        print("\n🔹 你的資源：")
-        for resource, count in owned_resources.items():
-            print(f"   {resource}：{count}")
-            
-        return owned_resources  # 返回資源字典，以便其他方法使用

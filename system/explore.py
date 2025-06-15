@@ -1,14 +1,13 @@
+from system.village import Village
 import time
 import random
-from system.village import Village
-def explore(player, location="螢露谷"):
-    """探索螢露谷或夢魘灣，獲得不同的資源或魔法生物"""
+
+def explore(player, location):
+    """探索指定地點獲取資源"""
     if len(player.inventory) >= player.max_creatures:
-        player.list_creatures()
-        print("❌ 培育室已滿，無法進行探索！請先釋放或合併生物。")           
-        print("💡 提示：請使用 `merge A B` 來融合生物，以釋放空間！")
-        return
-    
+        print("❌ 培育室已滿，無法獲得新的魔法生物！")
+        return False
+
     if location not in ["螢露谷", "夢魘灣", "精靈部落"]:
         print("❌ 無效的探索地點！請選擇 `螢露谷` 或 `夢魘灣`")
         return
@@ -22,12 +21,7 @@ def explore(player, location="螢露谷"):
         print("❌ 你尚未解鎖「夢魘灣」！請先使用七彩寶石解鎖土地。")
         return  
     
-    # 精靈部落只有當玩家解鎖第一塊土地後才可探索
-    if location == "精靈部落" and player.unlocked_lands < 1:
-        print("❌ 你尚未解鎖「精靈部落」！請先使用七彩寶石解鎖土地。")
-        village = Village()  
-        village.enter()
-        return
+
 
     print(f"🛤️ 你開始探索 {location}... ⏳（需時 1:00）")
     time.sleep(3)  # 模擬探索時間（縮短為 3 秒）
@@ -77,3 +71,13 @@ def explore(player, location="螢露谷"):
             for item in drops:
                 player.resources.add(item)
                 print(f"🌟 你現在擁有 {player.resources.get(item)} 個 {item}！")
+                
+def enter_village(player):
+    """進入精靈部落"""
+    if player.unlocked_lands < 1:
+        print("❌ 你尚未解鎖「精靈部落」！請先使用七彩寶石解鎖土地。")
+        return
+    
+    village = Village()
+    village.set_player(player)  # 如果你 village 裡面需要 player 資料
+    village.enter()

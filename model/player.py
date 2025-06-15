@@ -10,21 +10,11 @@ class Player:
         self.resources = ResourceManager()
         # 培育室最大容量
         self.max_creatures = 10
-        self.unlocked_lands = 1
+        self.unlocked_lands = 0
         self.exploration_count = {"螢露谷": 0, "夢魘灣": 0} 
         self.polluted_lands = {"螢露谷": False, "夢魘灣": False}  
         self.purification_level = 1
 
-    def _handle_village_exit(self, count):
-        """處理離開村莊時的事件"""
-        for creature in self.inventory:
-            creature.energy += creature.energy_rate * count
-            print(f"🔋 {creature.name}（{creature.color}） 產生了 {creature.energy_rate * count} 點能量！")
-            for creature in self.inventory:
-                drops = creature.drop_gem()
-                for item in drops:
-                    self.resources.add(item)
-                    print(f"🌟 你現在擁有 {self.resources.get(item)} 個 {item}！")
 
 
 
@@ -93,7 +83,15 @@ class Player:
             #顯示生物能量狀態
             print(f"   能量：{creature.energy} | 產能速度：{creature.energy_rate}")
     
+    def list_resources(self):
+        owned_resources = {k: v for k, v in self.resources.resources.items() if v > 0}
+        if not owned_resources:
+            print("目前沒有任何資源。")
+            return
 
+        print("\n🧺 目前持有資源：")
+        for resource, quantity in owned_resources.items():
+            print(f"- {resource}：{quantity} 個")
     
 
 

@@ -2,7 +2,7 @@ from config.gameConfig import COLOR_MIX_RULES, SPECIAL_DROPS
 import random
 
 class MagicCreature:
-    def __init__(self, name, color, energy, energy_rate):
+    def __init__(self, name, color, energy=50, energy_rate=10):
         self.name = name
         self.color = color  # 這隻生物的顏色
         self.energy = energy  # 當前能量
@@ -29,14 +29,17 @@ class MagicCreature:
         # 根據遺傳規則決定新顏色
         if color_pair in COLOR_MIX_RULES:
             possible_colors = COLOR_MIX_RULES[color_pair]
-            new_color = random.choices([c[0] for c in possible_colors], weights=[c[1] for c in possible_colors])[0]
+            new_color = random.choices(
+                [c[0] for c in possible_colors], 
+                weights=[c[1] for c in possible_colors]
+            )[0]
         elif "透明" in color_pair:
             new_color = "透明" if random.random() < 0.5 else partner.color
         else:
             new_color = random.choice(color_pair)  # 沒對應規則時，隨機選擇雙親顏色
 
 
-        new_creature = MagicCreature(self.name, new_color, 50, 10, player)
+        new_creature = MagicCreature(self.name, new_color)
         print(f"🍼 {self.name}（{self.color}） 和 {partner.name}（{partner.color}）生出了一隻 {new_creature.color} 色的 {new_creature.name}！")
         return new_creature
 

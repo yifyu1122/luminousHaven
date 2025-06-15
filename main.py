@@ -13,8 +13,6 @@ game_intro()
 
 player = Player()
 
-player.initialize_village()
-
 player.add_creature("星光螢火蟲", "紅")
 player.add_creature("星光螢火蟲", "黃")
 player.add_creature("夢魘貓", "藍")
@@ -30,11 +28,10 @@ commands = {
 def handle_breed(parts):
     """處理繁殖指令"""
     try:
-        parts = command.split()
         if len(parts) != 3:
-            raise ValueError  
-        idx1, idx2 = int(parts[1]), int(parts[2]) 
-        breed.breed_creatures(idx1, idx2)
+            raise ValueError
+        idx1, idx2 = int(parts[1]), int(parts[2])
+        breed.breed_creatures(player, idx1, idx2)  # 修正：傳入 player 實例
     except (ValueError, IndexError):
         print("❌ 指令格式錯誤！請使用 `breed A B`，例如 `breed 1 2`")
 
@@ -44,7 +41,7 @@ def handle_merge(parts):
         if len(parts) != 3:
             raise ValueError
         idx1, idx2 = int(parts[1]), int(parts[2])
-        merge.merge_creatures(idx1, idx2)
+        merge.merge_creatures(player, idx1, idx2)  # 修正：傳入 player 實例
     except (ValueError, IndexError):
         print("❌ 指令格式錯誤！請使用 `merge A B`，例如 `merge 1 2`")
 
@@ -59,15 +56,15 @@ def handle_explore():
         choice = input("\n👉 你想探索哪裡？（輸入 1 / 2 / 3）：").strip()
 
         if choice == "1":
-            explore.explore("螢露谷")
+            explore.explore(player, "螢露谷")  # 傳入 player 實例
         elif choice == "2":
-            explore.explore("夢魘灣")
+            explore.explore(player, "夢魘灣")  # 傳入 player 實例
         elif choice == "3":
-            player.village.enter() 
+            explore.enter_village(player)
         else:
             print("❌ 無效選項，請輸入 1 / 2 / 3。")
     else:
-        explore.explore("螢露谷")
+        explore.explore(player, "螢露谷")  # 傳入 player 實例
 
 
 while True:
